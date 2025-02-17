@@ -39,7 +39,7 @@ export default function LoginForm() {
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100">
+    <div className="flex items-center justify-center min-h-screen ">
       <motion.div
         className="w-full max-w-md p-8 rounded-xl shadow-2xl bg-white/90 backdrop-blur-lg border border-white/20"
         variants={containerVariants}

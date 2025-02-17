@@ -45,11 +45,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/user").authenticated()
                         .requestMatchers("/api/user/shipping/update").authenticated()
                         .requestMatchers("/api/order/confirm").authenticated()
-                        .requestMatchers(HttpMethod.GET,"/api/order/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/order/{id}").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                         .requestMatchers( "/admin/api/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/api/stats/**").hasRole("ADMIN")
+
 
 
                 )

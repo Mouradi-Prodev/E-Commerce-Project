@@ -14,15 +14,12 @@ const OrderSuccessPage: React.FC = () => {
     const orderId = searchParams?.get('orderId');
     const [order, setOrder] = useState<any>(null);
     const backendurl = process.env.NEXT_PUBLIC_BACKEND_URL;
+   
 
     useEffect(() => {
-        if (!orderId) {
+        if (user == null) {
             router.push('/');
             return;
-        } else {
-            // Clear the cart
-            localStorage.removeItem('cart');
-            setItemsCount(0);
         }
 
         async function fetchOrder() {

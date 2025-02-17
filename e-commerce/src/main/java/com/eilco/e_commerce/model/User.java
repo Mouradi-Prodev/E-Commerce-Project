@@ -2,6 +2,7 @@ package com.eilco.e_commerce.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +38,7 @@ public class User extends Model{
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
-    @ToString.Exclude
+    @JsonManagedReference
     private Role role;
 
 }

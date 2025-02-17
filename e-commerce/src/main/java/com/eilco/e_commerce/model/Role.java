@@ -1,5 +1,6 @@
 package com.eilco.e_commerce.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -26,6 +27,6 @@ public class Role {
 
     @OneToMany(mappedBy = "role", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @ToString.Exclude
-    @JsonIgnore
+    @JsonBackReference
     private List<User> users;
 }

@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -43,10 +44,10 @@ public class OrderController {
         UserResponse userResponse = (UserResponse) authentication.getPrincipal();
         User user = userResponse.getUser();
 
-
-
+        BigDecimal totalPrice = BigDecimal.ZERO;
         Order order = Order.builder()
                 .user(user)
+                .totalPrice(totalPrice)
                 .build();
         Order savedOrder = orderService.save(order);
 
@@ -54,7 +55,7 @@ public class OrderController {
         for (OrderProductRequest orderProductRequest : orderRequest.getOrderProducts()) {
             Product product = productService.getProductById(orderProductRequest.getProductId())
                     .orElseThrow(() -> new AppException("Product not found", HttpStatus.BAD_REQUEST));
-
+            totalPrice = totalPrice.add(product.getPrice().multiply(BigDecimal.valueOf(orderProductRequest.getQuantity())));
             OrderProduct orderProduct = OrderProduct.builder()
                     .product(product)
                     .order(savedOrder)
@@ -65,6 +66,7 @@ public class OrderController {
 
 
         savedOrder.setOrderProducts(orderProducts);
+        savedOrder.setTotalPrice(totalPrice);
         orderService.save(savedOrder);
 
         return ResponseEntity.ok(Map.of("orderId", order.getId()));

@@ -50,10 +50,14 @@ export async function confirmOrder(orderDTO: OrderDTO) {
 }
 
 export async function getOrderById(orderId: string) {
+    const cookie = (await cookies()).get("session")?.value;
+
+    if (!cookie) return null;
     const response = await fetch(`http://localhost:8080/api/order/${orderId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
+            Authorization: "Bearer " + cookie,
         },
     });
 

@@ -19,7 +19,7 @@ interface OrderDTO {
 }
 
 const ValidateOrderPage: React.FC = () => {
-  const { user, setUser, itemsCount } = useAuth();
+  const { user, setUser, itemsCount, setItemsCount } = useAuth();
   const router = useRouter();
   const [local_address, setAddress] = useState(user?.local_address || '');
   const [city, setCity] = useState(user?.city || '');
@@ -48,7 +48,11 @@ const ValidateOrderPage: React.FC = () => {
         quantity: item.quantity,
       })),
     };
+    // Clear the cart
+    localStorage.removeItem('cart');
+    setItemsCount(0);
     await confirmOrder(orderDTO);
+     
   };
 
   return (

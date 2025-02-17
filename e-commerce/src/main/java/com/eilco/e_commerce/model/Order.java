@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,9 @@ public class Order extends Model{
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private String id;
+
+    @Column(name = "totalPrice", nullable = false)
+    private BigDecimal totalPrice;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
