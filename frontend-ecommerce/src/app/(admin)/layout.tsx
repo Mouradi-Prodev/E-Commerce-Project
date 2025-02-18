@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -9,8 +10,8 @@ import Sidebar from "./components/sidebar";
 
 import { Providers } from "../providers";
 import { AuthProvider } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
-import { Loader } from "lucide-react";
+
+
 
 
 export const metadata: Metadata = {
@@ -26,21 +27,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen items-start justify-center">
-        <Loader size={64}/>
-
-      </div>
-    );
-  }
+  
 
 
   return (
