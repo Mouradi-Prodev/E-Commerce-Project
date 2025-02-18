@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button } from "@heroui/react";
 import TotalSalesComponent from "../../components/TotalSales";
 
@@ -7,6 +7,14 @@ import TotalOrdersComponent from "../../components/TotalOrders";
 import TotalCustomersComponent from "../../components/TotalCustomers";
 
 export default function App() {
+    const [isClient, setIsClient] = useState(false);
+      React.useEffect(() => {
+        setIsClient(true);}
+      , []);
+    
+      if (!isClient) {
+        return null;
+      }
 
     return (
         <>
