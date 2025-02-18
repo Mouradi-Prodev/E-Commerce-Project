@@ -1,3 +1,4 @@
+"use client"
 import { TotalCustomers } from '@/actions/stats';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';

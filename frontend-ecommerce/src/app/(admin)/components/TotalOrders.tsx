@@ -1,3 +1,5 @@
+"use client"
+
 import { TotalOrders } from '@/actions/stats';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
