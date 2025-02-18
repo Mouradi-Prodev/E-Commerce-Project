@@ -1,3 +1,4 @@
+"use client"
 import ProductTable from "../../components/ProductTable";
 
 

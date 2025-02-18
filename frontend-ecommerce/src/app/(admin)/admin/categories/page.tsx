@@ -1,3 +1,4 @@
+"use client";
 import CategoriesTable from "../../components/CategoriesTable";
 
 
