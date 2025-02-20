@@ -174,7 +174,7 @@ This project is [MIT](LICENSE) licensed.
 
 - Next.js team for the amazing framework
 - Spring Boot team for the robust backend solution
-- All contributors who helped make this project better
+
 
 ---
 
