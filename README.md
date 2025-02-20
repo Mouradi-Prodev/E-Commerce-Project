@@ -179,6 +179,6 @@ This project is [MIT](LICENSE) licensed.
 ---
 
 <p align="center">
-  Made with ❤️ by Your Name
+  Made with ❤️ by MOURADI SALAH EDDINE
 </p>
 
