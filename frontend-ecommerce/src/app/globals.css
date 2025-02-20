@@ -25,3 +25,9 @@
     0 15px 25px rgba(173, 216, 230, 0.3), 0 20px 40px rgba(173, 216, 230, 0.3),
     0 25px 50px rgba(173, 216, 230, 0.3), 0 30px 60px rgba(173, 216, 230, 0.3);
 }
+
+.bg-grid-gray-200 {
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, rgb(229 231 235 / 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(229 231 235 / 0.1) 1px, transparent 1px);
+}

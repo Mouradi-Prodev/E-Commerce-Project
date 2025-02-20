@@ -20,6 +20,9 @@ export async function getUser() {
       Authorization: "Bearer " + cookie,
     },
   });
+  if(!response.ok) {
+    return  null;
+  }
 
   const data = await response.json();
   
