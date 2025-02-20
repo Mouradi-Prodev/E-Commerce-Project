@@ -3,36 +3,49 @@ import Image from 'next/image';
 import { getProductById } from '@/actions/product';
 import { useAuth } from '@/context/AuthContext';
 import { Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface CartItemProps {
   productId: string;
   quantity: number;
-  updateCart: (updatedCart: { id: string; quantity: number }[]) => void;
+  updateCart: (updatedCart: { id: string; price: number; quantity: number }[]) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({ productId, quantity, updateCart }) => {
   const [product, setProduct] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [itemQuantity, setItemQuantity] = useState(quantity);
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const { itemsCount, setItemsCount } = useAuth();
 
   useEffect(() => {
     async function fetchProduct() {
-      const data = await getProductById(productId);
-      setProduct(data);
+      try {
+        const data = await getProductById(productId);
+        console.log('Fetched product:', data); // Debug log
+        if (!data) {
+          setError('Product not found');
+          return;
+        }
+        setProduct(data);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+        setError('Failed to load product');
+      }
     }
     fetchProduct();
   }, [productId]);
 
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const updatedCart = cart.map((item: { id: string; quantity: number }) =>
+    const updatedCart = cart.map((item: { id: string; price: number; quantity: number }) =>
       item.id === productId ? { ...item, quantity: itemQuantity } : item
     );
     updateCart(updatedCart);
   }, [itemQuantity, productId]);
 
-  if (!product) return null;
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
+  if (!product) return <div className="p-4">Loading...</div>;
 
   const handleIncreaseQuantity = () => {
     setItemsCount(itemsCount + 1);
@@ -63,43 +76,65 @@ const CartItem: React.FC<CartItemProps> = ({ productId, quantity, updateCart }) 
   };
 
   return (
-    <div className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow-md">
-      <div className="relative w-24 h-24">
-        <Image src={`${backendUrl}${product.imageUrl}`} alt={product.name} layout="fill" className="object-cover rounded-lg" />
-      </div>
-      <div className="flex-1">
-        <h2 className="text-lg font-semibold">{product.name}</h2>
-        <p className="text-gray-600">{product.description}</p>
-        <p className="text-indigo-600 font-bold">${product.price.toFixed(2)}</p>
-        <div className="flex items-center space-x-2">
-          <button
-            className="bg-gray-200 text-gray-700 px-2 py-1 rounded-lg hover:bg-gray-300 transition duration-300"
-            onClick={handleDecreaseQuantity}
-          >
-            -
-          </button>
-          <input
-            type="number"
-            value={itemQuantity}
-            onChange={handleQuantityChange}
-            className="w-16 text-center bg-gray-200 text-gray-700 rounded-lg"
-            min="1"
-          />
-          <button
-            className="bg-gray-200 text-gray-700 px-2 py-1 rounded-lg hover:bg-gray-300 transition duration-300"
-            onClick={handleIncreaseQuantity}
-          >
-            +
-          </button>
-          <button
-            className="bg-red-200 text-red-700 px-2 py-1 rounded-lg hover:bg-red-300 transition duration-300"
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      className="flex items-center gap-6 p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+    >
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        className="relative w-32 h-32 overflow-hidden rounded-lg"
+      >
+        <Image
+          src={`${backendUrl}${product.imageUrl}`}
+          alt={product.name}
+          fill
+          sizes="(max-width: 128px) 100vw, 128px"
+          style={{ objectFit: 'cover' }}
+          className="transition-transform duration-300 hover:scale-110"
+        />
+      </motion.div>
+      <div className="flex-1 space-y-3">
+        <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
+        <p className="text-gray-600 line-clamp-2">{product.description}</p>
+        <p className="text-2xl font-bold text-indigo-600">${product.price.toFixed(2)}</p>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center bg-gray-100 rounded-lg overflow-hidden">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-2 text-gray-600 hover:bg-gray-200 transition-colors"
+              onClick={handleDecreaseQuantity}
+            >
+              -
+            </motion.button>
+            <input
+              type="number"
+              value={itemQuantity}
+              onChange={handleQuantityChange}
+              className="w-16 text-center bg-transparent border-none focus:ring-0"
+              min="1"
+            />
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-2 text-gray-600 hover:bg-gray-200 transition-colors"
+              onClick={handleIncreaseQuantity}
+            >
+              +
+            </motion.button>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 text-red-500 hover:text-red-600 bg-red-50 rounded-full"
             onClick={handleDelete}
           >
             <Trash2 className="w-5 h-5" />
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

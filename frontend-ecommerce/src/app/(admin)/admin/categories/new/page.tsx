@@ -9,7 +9,7 @@ import { createCategory } from "@/actions/category";
 
 export default function NewCategoryPage() {
   const [state, action, pending] = React.useActionState(createCategory, undefined);
- 
+
 
   return (
     <motion.div
@@ -37,6 +37,15 @@ export default function NewCategoryPage() {
           placeholder="Enter description"
           isInvalid={!!state?.errors?.description}
           errorMessage={state?.errors?.description?.[0]}
+        />
+
+        {/* Image URL */}
+        <Input
+          name="image_url"
+          label="Image URL"
+          placeholder="Enter image URL"
+          isInvalid={!!state?.errors?.image_url}
+          errorMessage={state?.errors?.image_url?.[0]}
         />
 
         {/* Submit Button */}

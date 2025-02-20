@@ -78,6 +78,7 @@ public class CategoryService {
                 .id(id)
                 .name(categoryRequest.getName())
                 .description(categoryRequest.getDescription())
+                .image_url(categoryRequest.getImage_url())
                 .build();
     }
 }

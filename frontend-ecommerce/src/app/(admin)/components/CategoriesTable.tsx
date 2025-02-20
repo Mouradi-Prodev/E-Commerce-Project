@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import { Button, Tooltip } from "@heroui/react";
 import { deleteCategory, fetchCategories } from "@/actions/category";
-
 
 interface Category {
   id: string;
   name: string;
   description: string;
+  image_url: string;
 }
 
 export default function CategoriesTable() {
@@ -56,6 +57,7 @@ export default function CategoriesTable() {
           <table className="min-w-full border border-gray-200 rounded-md">
             <thead className="bg-gray-100">
               <tr>
+                <th className="py-2 px-4 text-left">Image</th>
                 <th className="py-2 px-4 text-left">Name</th>
                 <th className="py-2 px-4 text-left">Description</th>
                 <th className="py-2 px-4 text-left">Actions</th>
@@ -63,7 +65,29 @@ export default function CategoriesTable() {
             </thead>
             <tbody>
               {categories.map((category) => (
-                <tr key={category.id} className="border-t">
+                <motion.tr
+                  key={category.id}
+                  className="border-t hover:bg-gray-50"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <td className="py-2 px-4">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      className="relative w-12 h-12 overflow-hidden rounded-lg"
+                    >
+                      <img
+                        src={category.image_url || '/placeholder-image.jpg'}
+                        alt={category.name}
+                       
+                        className="object-cover"
+                        sizes="(max-width: 48px) 100vw, 48px"
+                      />
+                    </motion.div>
+                  </td>
                   <td className="py-2 px-4">{category.name}</td>
                   <td className="py-2 px-4">
                     <Tooltip content={category.description}>
@@ -84,7 +108,7 @@ export default function CategoriesTable() {
                       Delete
                     </Button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>

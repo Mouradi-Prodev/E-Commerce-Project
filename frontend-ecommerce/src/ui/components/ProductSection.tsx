@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import React from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import ProductCard from "./ProductCard";
 import { getProducts } from "@/actions/user/product";
 
@@ -18,68 +16,71 @@ interface Product {
   category?: { name: string };
 }
 
-export default  function ProductSection() {
-  const [index, setIndex] = useState(0);
-
+export default function ProductSection() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const prevSlide = () => {
-    setIndex((prev) => (prev === 0 ? products.length - 1 : prev - 1));
-  };
-
-  const nextSlide = () => {
-    setIndex((prev) => (prev === products.length - 1 ? 0 : prev + 1));
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const data = await getProducts();
       setProducts(data);
+      setIsLoading(false);
     };
     fetchData();
   }, []);
 
-  if (products.length === 0) return <p>No product available</p>;
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
-  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
-    <section className="relative w-full py-16 px-6 md:px-12 lg:px-20">
-      <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">Latest Products</h2>
-
-      <div className="relative flex items-center justify-center">
-        {/* Left Button */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-0 z-10 p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition"
+    <section className="py-16 px-4 bg-gradient-to-br from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
         >
-          <ChevronLeft className="w-6 h-6 text-gray-700" />
-        </button>
+          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+            Discover Our Products
+          </h2>
+          <p className="mt-4 text-gray-600">Find your perfect match from our curated collection</p>
+        </motion.div>
 
-        {/* Product Cards */}
-        <div className="w-full max-w-3xl flex overflow-hidden">
-          <AnimatePresence mode="wait">
-            {products.slice(index, index + (window.innerWidth < 640 ? 1 : 2)).map((product) => (
-              <motion.div
-                key={product.id}
-                className="w-full sm:w-1/2 flex-shrink-0 px-3"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.5 }}
-              >
-                 <ProductCard key={product.id} product={product} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {/* Right Button */}
-        <button
-          onClick={nextSlide}
-          className="absolute right-0 z-10 p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition"
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
-          <ChevronRight className="w-6 h-6 text-gray-700" />
-        </button>
+          {products.map((product) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <ProductCard product={product} />
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

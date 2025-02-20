@@ -9,5 +9,6 @@ import lombok.Data;
 public class CategoryRequest {
     private String name;
     private String description;
+    private String image_url;
 
 }

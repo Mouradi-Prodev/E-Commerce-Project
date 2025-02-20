@@ -39,6 +39,7 @@ export async function createCategory(state: FormState, formData: FormData) {
   const validatedFields = CategoryFormSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
+    image_url: formData.get("image_url"),
   });
 
   if (!validatedFields.success) {
@@ -57,6 +58,9 @@ export async function createCategory(state: FormState, formData: FormData) {
   formDataToSend.append("name", categoryData.name);
   if (categoryData.description) {
     formDataToSend.append("description", categoryData.description);
+  }
+  if (categoryData.image_url) {
+    formDataToSend.append("image_url", categoryData.image_url);
   }
 
   const response = await fetch("http://localhost:8080/admin/api/categories/create", {
@@ -80,6 +84,7 @@ export async function updateCategory(state: FormState, formData: FormData, categ
   const validatedFields = CategoryFormSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
+    image_url: formData.get("image_url"),
   });
 
   if (!validatedFields.success) {
@@ -97,6 +102,9 @@ export async function updateCategory(state: FormState, formData: FormData, categ
   formDataToSend.append("name", categoryData.name);
   if (categoryData.description) {
     formDataToSend.append("description", categoryData.description);
+  }
+  if (categoryData.image_url) {
+    formDataToSend.append("image_url", categoryData.image_url);
   }
 
   const response = await fetch(`http://localhost:8080/admin/api/categories/update/${categoryId}`, {

@@ -24,7 +24,7 @@ interface AuthContextType {
   signup: (state: FormStateSignup, formData: FormData) => void;
   logout: () => Promise<void>;
   logoutUser: () => Promise<void>;
-  addToCart: (productId: string, quantity: number) => void;
+  addToCart: (productId: string, price: number, quantity: number) => void;
   itemsCount: number;
   setItemsCount: (count: number) => void;
 }
@@ -164,13 +164,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
 
-  const addToCart = (productId: string, quantity: number) => {
+  const addToCart = (productId: string, price: number, quantity: number) => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existingProduct = cart.find((item: { id: string }) => item.id === productId);
     if (existingProduct) {
       existingProduct.quantity += quantity;
     } else {
-      cart.push({ id: productId, quantity: quantity });
+      cart.push({ id: productId, price: price,quantity: quantity });
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));

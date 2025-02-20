@@ -4,11 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
-import { Button } from '@heroui/react';
 import CartItem from '@/ui/components/CartItem';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getProductById } from '@/actions/product';
+import { Button } from '@heroui/react';
 
 const CartPage: React.FC = () => {
-  const [cart, setCart] = useState<{ id: string; quantity: number }[]>([]);
+  const [cart, setCart] = useState<{ id: string; price: number; quantity: number }[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const [totalPrice, setTotalPrice] = useState(0);
@@ -16,16 +19,20 @@ const CartPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    setCart(cart);
+    const savedCart = localStorage.getItem('cart');
+    console.log('Saved cart:', savedCart); // Debug log
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      console.log('Parsed cart:', parsedCart); // Debug log
+      setCart(parsedCart);
+    }
+    setIsLoading(false);
   }, []);
 
-  const calculateTotalPrice = async (cart: { id: string; quantity: number }[]) => {
+  const calculateTotalPrice = async (cart: { id: string; price: number; quantity: number }[]) => {
     let total = 0;
     for (const item of cart) {
-      const response = await fetch(`${backendUrl}api/products/${item.id}`);
-      const product = await response.json();
-      total += product.price * item.quantity;
+      total += item.price * item.quantity;
     }
     setTotalPrice(total);
   };
@@ -34,46 +41,104 @@ const CartPage: React.FC = () => {
     calculateTotalPrice(cart);
   }, [cart]);
 
-  const updateCart = (updatedCart: { id: string; quantity: number }[]) => {
+  const updateCart = (updatedCart: { id: string; price: number; quantity: number }[]) => {
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     calculateTotalPrice(updatedCart);
   };
-
 
   const handleValidateOrder = () => {
     if (!user) {
       router.push('/login');
     } else {
       localStorage.setItem('cart', JSON.stringify(cart));
-      if(itemsCount === 0)
-      {
+      if (itemsCount === 0) {
         router.push('/');
-      }else
-      router.push('/order/validate');
+      } else
+        router.push('/order/validate');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
-      <div className="space-y-4">
-        {cart.map((item) => (
-          <CartItem key={item.id} productId={item.id} quantity={item.quantity} updateCart={updateCart} />
-        ))}
-      </div>
-      <div className="mt-8 text-right">
-        <h2 className="text-2xl font-bold">Total Price: ${totalPrice.toFixed(2)}</h2>
-      </div>
-      <div className="mt-8">
-        <Button
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition duration-300"
-          onPress={handleValidateOrder}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-8"
+    >
+      <motion.h1
+        initial={{ y: -20 }}
+        animate={{ y: 0 }}
+        className="text-4xl font-bold mb-12 text-gray-800 text-center"
+      >
+        Your Shopping Cart
+      </motion.h1>
+
+      <div className="max-w-4xl mx-auto">
+        <AnimatePresence>
+          {isLoading ? (
+            <div className="text-center py-16">
+              <p>Loading...</p>
+            </div>
+          ) : cart.length > 0 ? (
+            <motion.div className="space-y-6">
+              {cart.map((item, index) => {
+                console.log('Rendering item:', item); // Debug log
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <CartItem
+                      productId={item.id}
+                      quantity={item.quantity}
+                      updateCart={updateCart}
+                    />
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16"
+            >
+              <p className="text-xl text-gray-600">Your cart is empty</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-12 bg-white rounded-2xl shadow-lg p-6"
         >
-          Validate Order
-        </Button>
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-xl font-medium text-gray-600">Total</span>
+            <span className="text-3xl font-bold text-indigo-600">
+              ${totalPrice.toFixed(2)}
+            </span>
+          </div>
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Button
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl
+                       text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              onPress={handleValidateOrder}
+            >
+              Proceed to Checkout
+            </Button>
+          </motion.div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

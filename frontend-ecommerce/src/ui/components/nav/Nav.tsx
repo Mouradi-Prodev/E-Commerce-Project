@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import {
@@ -20,29 +20,36 @@ import { ShoppingBasket, User } from "lucide-react";
 
 
 const navVariants = {
-    hidden: { opacity: 0, y: -20 },
+    hidden: { y: -100, opacity: 0 },
     visible: {
-        opacity: 1,
         y: 0,
+        opacity: 1,
         transition: {
-            duration: 0.5,
-            staggerChildren: 0.1,
-            when: "beforeChildren"
+            type: "spring",
+            stiffness: 100,
+            damping: 20,
+            staggerChildren: 0.1
         }
     }
 };
 
 const navItemVariants = {
-    hidden: { opacity: 0, y: -10 },
+    hidden: { y: -20, opacity: 0 },
     visible: {
-        opacity: 1,
         y: 0,
+        opacity: 1,
         transition: {
             type: "spring",
-            stiffness: 120,
-            damping: 12
+            stiffness: 150,
+            damping: 15
         }
     }
+};
+
+const searchVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.05 },
+    tap: { scale: 0.95 }
 };
 
 export const AcmeLogo = () => {
@@ -98,9 +105,6 @@ export default function Nav() {
         setIsClient(true);
     }, []);
 
-
-
-
     if (!isClient) return null;
 
     const routes = [
@@ -108,34 +112,27 @@ export default function Nav() {
         { path: '/categories', label: 'Categories' },
     ];
 
-
-
     return (
         <motion.div
             initial="hidden"
             animate="visible"
             variants={navVariants}
-            className="w-full"
+            className="fixed top-0 w-full z-50"
         >
-            <Navbar
-
-                className="bg-white/90 backdrop-blur-lg border-white/20"
-                classNames={{
-                    wrapper: "w-full px-3 sm:px-8",
-                }}
-            >
+            <Navbar className="bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm">
                 <NavbarContent justify="start">
                     <motion.div variants={navItemVariants}>
-                        <NavbarBrand className="mr-4 gap-2">
+                        <NavbarBrand className="mr-4">
                             <motion.div
-                                whileHover={{ scale: 1.05 }}
+                                whileHover={{ scale: 1.1, rotate: 5 }}
+                                whileTap={{ scale: 0.9 }}
                                 className="cursor-pointer"
                                 onClick={() => router.push('/')}
                             >
                                 <AcmeLogo />
                             </motion.div>
                             <motion.p
-                                className="hidden sm:block font-bold text-sky-800 cursor-pointer"
+                                className="hidden sm:block font-bold bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent"
                                 whileHover={{ x: 5 }}
                                 onClick={() => router.push('/')}
                             >
@@ -144,143 +141,145 @@ export default function Nav() {
                         </NavbarBrand>
                     </motion.div>
 
-                    <NavbarContent className="hidden sm:flex gap-3">
+                    <NavbarContent className="hidden sm:flex gap-4">
                         {routes.map((route) => (
                             <motion.div key={route.path} variants={navItemVariants}>
-                                <NavbarItem isActive={pathname === route.path}>
-                                    <Link
-                                        className="relative cursor-pointer  text-sky-800 hover:text-sky-600 transition-colors"
-                                        underline="none"
-                                        href='#'
-                                        onPress={() => router.push(route.path)}
+                                <NavbarItem>
+                                    <motion.div
+                                        whileHover={{ y: -2 }}
+                                        className="relative"
                                     >
-                                        <motion.p
-                                            className="hidden sm:block "
-                                            whileHover={{ y: -5 }}
-
+                                        <Link
+                                            className="text-sky-800 font-medium"
+                                            href="#"
+                                            onPress={() => router.push(route.path)}
                                         >
                                             {route.label}
-                                        </motion.p>
-
-                                        {pathname === route.path && (
-                                            <motion.div
-                                                className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-500"
-                                                layoutId="nav-underline"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                    </Link>
+                                            {pathname === route.path && (
+                                                <motion.div
+                                                    layoutId="navunderline"
+                                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-sky-500 to-blue-600"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                />
+                                            )}
+                                        </Link>
+                                    </motion.div>
                                 </NavbarItem>
                             </motion.div>
                         ))}
                     </NavbarContent>
                 </NavbarContent>
 
-                <NavbarContent as="div" className="items-center" justify="end">
+                <NavbarContent justify="end">
                     <motion.div variants={navItemVariants}>
-                        <Input
-                            classNames={{
-                                base: "max-w-full sm:max-w-[12rem] h-10",
-                                mainWrapper: "h-full",
-                                input: "text-small text-sky-800",
-                                inputWrapper: "h-full bg-white/50 border border-sky-100 hover:border-sky-300 focus-within:border-sky-500 transition-colors",
-                            }}
-                            placeholder="Search..."
-                            size="sm"
-                            startContent={<SearchIcon size={18} width={18} height={18} className="text-sky-500" />}
-                            type="search"
-                        />
+                        <motion.div
+                            variants={searchVariants}
+                            initial="rest"
+                            whileHover="hover"
+                            whileTap="tap"
+                        >
+                            <Input
+                                classNames={{
+                                    base: "max-w-full sm:max-w-[14rem]",
+                                    inputWrapper: "bg-white/50 hover:bg-white/80 transition-all duration-300 shadow-sm hover:shadow-md",
+                                }}
+                                placeholder="Search..."
+                                startContent={<SearchIcon className="text-sky-500" />}
+                                endContent={
+                                    <motion.div
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        className="bg-sky-100 p-1 rounded-full cursor-pointer"
+                                    >
+                                        <kbd className="text-xs text-sky-600">⌘K</kbd>
+                                    </motion.div>
+                                }
+                            />
+                        </motion.div>
                     </motion.div>
+
                     {itemsCount > 0 && (
-                        <motion.div variants={navItemVariants} className="relative cursor-pointer" onClick={() => router.push("/cart")}>
-                            <ShoppingBasket size={24} className="text-sky-800 hover:text-sky-600 transition-colors" />
-                            <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                        <motion.div
+                            variants={navItemVariants}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="relative cursor-pointer"
+                            onClick={() => router.push("/cart")}
+                        >
+                            <ShoppingBasket className="text-sky-800 hover:text-sky-600 transition-colors" />
+                            <motion.span
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center"
+                            >
                                 {itemsCount}
-                            </span>
+                            </motion.span>
                         </motion.div>
                     )}
-                    {user ?
-                        (<motion.div variants={navItemVariants}>
-                            <Dropdown placement="bottom-end">
-                                <DropdownTrigger>
-                                    {/* <Avatar
-                                        isBordered
-                                        as="button"
-                                        className="transition-transform hover:scale-105 border-sky-500"
-                                        color="primary"
-                                        name="Jason Hughes"
-                                        size="sm"
-                                        src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                                    /> */}
-                                    <User size={24} className="text-sky-800 hover:text-sky-600 transition-colors cursor-pointer" />
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label="Profile Actions"
-                                    variant="flat"
-                                    className="bg-white/90 backdrop-blur-lg border border-white/20"
-                                >
-                                    <DropdownItem key="profile" className="h-14 gap-2 bg-sky-50">
-                                        <p className="font-semibold text-sky-800">Signed in as</p>
-                                        <p className="font-semibold text-sky-600">{user?.email}</p>
-                                    </DropdownItem>
 
-                                    <DropdownItem
-                                        key="logout"
-                                        className="text-red-600  hover:bg-red-50"
-                                        onPress={() => {
-                                            logoutUser && logoutUser();
-                                        }}
+                    <AnimatePresence>
+                        {user ? (
+                            <motion.div
+                                variants={navItemVariants}
+                                whileHover={{ scale: 1.05 }}
+                            >
+                                <Dropdown>
+                                    <DropdownTrigger>
+                                        <User size={24} className="text-sky-800 hover:text-sky-600 transition-colors cursor-pointer" />
+                                    </DropdownTrigger>
+                                    <DropdownMenu
+                                        aria-label="Profile Actions"
+                                        variant="flat"
+                                        className="bg-white/90 backdrop-blur-lg border border-white/20"
                                     >
-                                        Log Out
-                                    </DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>
-                        </motion.div>) :
-                        (
-                            <motion.div variants={navItemVariants} className="flex items-center space-x-4">
-                                <Link
-                                    className="relative text-sky-800 hover:text-sky-600 transition-colors"
-                                    underline="none"
-                                    href='#'
-                                    onPress={() => router.push('/login')}
-                                >
-                                    <motion.p
-                                        className="hidden sm:block  cursor-pointer"
-                                        whileHover={{ y: -5 }}
-                                    >
-                                        Login
-                                    </motion.p>
-                                    {pathname === "/login" && (
-                                        <motion.div
-                                            className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-500"
-                                            layoutId="nav-underline"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
+                                        <DropdownItem key="profile" className="h-14 gap-2 bg-sky-50">
+                                            <p className="font-semibold text-sky-800">Signed in as</p>
+                                            <p className="font-semibold text-sky-600">{user?.email}</p>
+                                        </DropdownItem>
 
-                                </Link>
-                                <Link
-                                    className="relative text-sky-800 hover:text-sky-600 transition-colors"
-                                    underline="none"
-                                    href='#'
-                                    onPress={() => router.push('/register')}
-                                >
-                                    <motion.p
-                                        className="hidden sm:block  cursor-pointer"
-                                        whileHover={{ y: -5 }}
+                                        <DropdownItem
+                                            key="logout"
+                                            className="text-red-600  hover:bg-red-50"
+                                            onPress={() => {
+                                                logoutUser && logoutUser();
+                                            }}
+                                        >
+                                            Log Out
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </motion.div>
+                        ) : (
+                            <motion.div variants={navItemVariants} className="flex items-center gap-4">
+                                {[
+                                    { path: '/login', label: 'Login' },
+                                    { path: '/register', label: 'Register' }
+                                ].map((item) => (
+                                    <motion.div
+                                        key={item.path}
+                                        whileHover={{ y: -2 }}
+                                        whileTap={{ y: 0 }}
                                     >
-                                        Register
-                                    </motion.p>
-                                    {pathname === "/register" && (
-                                        <motion.div
-                                            className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-500"
-                                            layoutId="nav-underline"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-                                </Link>
+                                        <Link
+                                            className="relative px-4 py-2 text-sky-800 font-medium hover:text-sky-600"
+                                            href="#"
+                                            onPress={() => router.push(item.path)}
+                                        >
+                                            {item.label}
+                                            {pathname === item.path && (
+                                                <motion.div
+                                                    layoutId="auth-underline"
+                                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-sky-500 to-blue-600"
+                                                />
+                                            )}
+                                        </Link>
+                                    </motion.div>
+                                ))}
                             </motion.div>
                         )}
+                    </AnimatePresence>
                 </NavbarContent>
             </Navbar>
         </motion.div>

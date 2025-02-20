@@ -3,33 +3,35 @@
 import React, { useEffect, useState } from "react";
 import ProductSection from "@/ui/components/ProductSection";
 import WelcomeBanner from "@/ui/components/Welcome";
+import Footer from "@/ui/components/Footer";
 import { Loader } from "lucide-react";
+import CategorySection from "@/ui/components/CategorySection";
 
-
-
-export default function page() {
+export default function Page() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-
   if (!mounted) {
     return (
-      <div className="min-h-screen items-start justify-center">
-        <Loader size={64} />
-        
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader size={64} className="animate-spin text-sky-600" />
       </div>
     );
   }
 
   return (
-    <>
-      <div className="min-h-screen  items-start justify-center">
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
         <WelcomeBanner />
-        <ProductSection />
-      </div>
-    </>
+        <div className="bg-gradient-to-b from-white to-sky-50">
+          <CategorySection />
+          <ProductSection />
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }

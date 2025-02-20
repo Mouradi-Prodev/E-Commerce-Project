@@ -16,6 +16,7 @@ interface Category {
     id: string;
     name: string;
     description: string;
+    image_url: string;
 }
 
 export default function EditCategoryPage({ params: initialParams }: { params: Promise<Params> }) {
@@ -69,6 +70,16 @@ export default function EditCategoryPage({ params: initialParams }: { params: Pr
                         defaultValue={category.description}
                         isInvalid={!!state?.errors?.description}
                         errorMessage={state?.errors?.description?.[0]}
+                    />
+
+                    {/* Image URL */}
+                    <Input
+                        name="image_url"
+                        label="Image URL"
+                        placeholder="Enter image URL"
+                        defaultValue={category.image_url}
+                        isInvalid={!!state?.errors?.image_url}
+                        errorMessage={state?.errors?.image_url?.[0]}
                     />
 
                     {/* Submit Button */}
